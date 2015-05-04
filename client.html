@@ -1,0 +1,339 @@
+<html>
+<head>
+<script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+<script type="text/javascript">
+	var turns = 0;
+	var socket = io.connect('http://localhost:3000'/*輸入連線IP*/);
+	var ct=1;
+	var ar=[0,0,0,0,0,0,0,0,0];
+	//連到Server後
+	socket.on('connect',function(){
+		console.log("connect");
+	});
+	//接收Server傳來的資料
+	socket.on('data',function(count,arr){
+		ct=count;
+		for(i=0;i<9;i++)
+			ar[i]=arr[i];
+		console.log("ct="+ct+"ar="+ar);
+		syn(ar);
+	});
+	
+	//判斷輸贏
+	socket.on('worl',function(fn){
+		if(fn==turns)
+			document.getElementById("win").style.display = "block";
+		else if(fn!=turns && fn!=3)
+			document.getElementById("lose").style.display = "block";
+		else
+			document.getElementById("draw").style.display = "block";
+			document.getElementById("img").style.display = "none";
+	});
+	//按下按鈕後的判斷
+	function press(a){											//判斷圈叉
+		var img = document.getElementById("img"+a);
+			if(ar[a-1]==0){
+				if(ct==1 && ct==turns){
+					ct=2;
+					ar[a-1]=1;
+					socket.emit('databack',ct,ar);
+					for(i=0;i<9;i++)
+					console.log("arr["+i+"]="+ar[i]+"\n");
+					console.log("------------------------------------");
+				}
+				else if(ct==2 && ct==turns){
+					ct=1;
+					ar[a-1]=2;
+					socket.emit('databack',ct,ar);
+					for(i=0;i<9;i++)
+					console.log("arr["+i+"]="+ar[i]+"\n");
+					console.log("------------------------------------");
+				}
+				else{
+					alert('Not your turn!');
+				}
+			}
+			else
+				alert("Can't select!");
+	};
+	//圖片同步
+	function syn(ar){
+		var img1 = document.getElementById("img1");
+		if(ar[0]==1)
+			img1.src="./1.png";
+		else if(ar[0]==2)
+			img1.src="./2.png";
+		else
+			img1.src="./0.png";
+		var img2 = document.getElementById("img2");
+		if(ar[1]==1)
+			img2.src="./1.png";
+		else if(ar[1]==2)
+			img2.src="./2.png";
+		else
+			img2.src="./0.png";
+		var img3 = document.getElementById("img3");
+		if(ar[2]==1)
+			img3.src="./1.png";
+		else if(ar[2]==2)
+			img3.src="./2.png";
+		else
+			img3.src="./0.png";
+		var img4 = document.getElementById("img4");
+		if(ar[3]==1)
+			img4.src="./1.png";
+		else if(ar[3]==2)
+			img4.src="./2.png";
+		else
+			img4.src="./0.png";
+		var img5 = document.getElementById("img5");
+		if(ar[4]==1)
+			img5.src="./1.png";
+		else if(ar[4]==2)
+			img5.src="./2.png";
+		else
+			img5.src="./0.png";
+		var img6 = document.getElementById("img6");
+		if(ar[5]==1)
+			img6.src="./1.png";
+		else if(ar[5]==2)
+			img6.src="./2.png";
+		else
+			img6.src="./0.png";
+		var img7 = document.getElementById("img7");
+		if(ar[6]==1)
+			img7.src="./1.png";
+		else if(ar[6]==2)
+			img7.src="./2.png";
+		else
+			img7.src="./0.png";
+		var img8 = document.getElementById("img8");
+		if(ar[7]==1)
+			img8.src="./1.png";
+		else if(ar[7]==2)
+			img8.src="./2.png";
+		else
+			img8.src="./0.png";
+		var img9 = document.getElementById("img9");
+		if(ar[8]==1)
+			img9.src="./1.png";
+		else if(ar[8]==2)
+			img9.src="./2.png";
+		else
+			img9.src="./0.png";
+		/*var img = [				
+					img1.src,
+					img2.src,
+					img3.src,
+					img4.src,
+					img5.src,
+					img6.src,
+					img7.src,
+					img8.src,
+					img9.src,
+					];
+	
+		for(i=0;i<10;i++){
+		if(ar[i]==1)
+			img[i]="file:///C:/Users/Ryo/Desktop/PROJECT/1.png";
+			console.log(img[i]);
+		if(ar[i]==2)
+			img[i]="file:///C:/Users/Ryo/Desktop/PROJECT/2.png";
+			console.log(img[i]);*/
+	};
+	//選圈或叉
+	function t(a){
+		if(a==1 && turns==0)
+			turns=1;
+		else if(a==2 && turns==0)
+			turns=2;
+	socket.emit('turn',turns);
+	document.getElementById("choose").style.display = "none";
+	document.getElementById("img").style.display = "block";
+};
+	//按下restart
+	function rt(){
+		console.log("restart!");
+		var rs=1;
+		socket.emit('restart',rs);
+		document.getElementById("win").style.display = "none";	//關掉win div
+		document.getElementById("lose").style.display = "none";	//關掉lose div
+		document.getElementById("draw").style.display = "none";	//關掉draw div
+		document.getElementById("choose").style.display = "block";	//開啟choose div
+		turns = 0;
+		ct=1;
+		ar=[0,0,0,0,0,0,0,0,0];
+	};
+</script>
+
+<style type="text/css">
+		
+		.choose	{
+				position: absolute;
+				width: 610px;
+				height: 610px;
+				background-image:url('./choose.png');
+			}
+		.top	{
+				width:610px; 
+				height:200px; 
+				margin: 0px auto;
+				background-image:url('./top.png');
+			}
+		.box	{
+				background-color:#F5F5F5; 
+				width:610px; 
+				height:610px; 
+				margin: 0px auto;
+			}
+		.bottom	{
+				width:610px; 
+				height:100px; 
+				margin: 0px auto;
+				background-image:url('./bottom.png');
+			}
+		#img	{
+				display:none;
+			}
+		#imgo	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 300px;
+				left: 75px;
+			}
+		#imgx	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 300px;
+				left: 125px;
+			}
+		#img1	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}	
+		#img2	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img3	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img4	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img5	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img6	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img7	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img8	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#img9	{
+				position: relative; 
+				width: 200px;
+				height: 200px;
+				top: 0px;
+				left: 0px
+			}
+		#win	{
+				display:none;
+				position: absolute;
+				width: 610px;
+				height: 610px;
+				background-image:url('./win.png');
+			}
+		#lose	{
+				display:none;
+				position: absolute;
+				width: 610px;
+				height: 610px;
+				background-image:url('./lose.png');
+			}
+		#draw	{
+				display:none;
+				position: absolute;
+				width: 610px;
+				height: 610px;
+				background-image:url('./draw.png');
+			}
+		#restart{
+				position: absolute;
+				width: 109px;
+				height: 25px;
+				top: 500px;
+				left: 450px;
+				background-image:url('./restart.png');
+			}
+	</style>
+</head>
+<body>
+<div>
+<div class="top"></div>
+<div class="box">
+	<div id="choose"class="choose">					<!--選圈叉的介面-->
+	<img id="imgo" src="./1.png" onClick="t(1)">	<!--選圈的圖案-->
+	<img id="imgx" src="./2.png" onClick="t(2)">	<!--選叉的圖案-->
+	</div>
+	
+	<div id="win">	<!--win的介面-->
+		<img id="restart" src="./restart.png" onClick="rt()">
+	</div>
+	<div id="lose">	<!--lose的介面-->
+		<img id="restart" src="./restart.png" onClick="rt()">
+	</div>
+	<div id="draw">	<!--draw的介面-->
+		<img id="restart" src="./restart.png" onClick="rt()">
+	</div>
+	<div id="img">	<!--井字的介面-->
+	<img id="img1"  src="./0.png" onClick="press(1)">
+	<img id="img2"  src="./0.png" onClick="press(2)">
+	<img id="img3"  src="./0.png" onClick="press(3)">
+	<img id="img4"  src="./0.png" onClick="press(4)">
+	<img id="img5"  src="./0.png" onClick="press(5)">
+	<img id="img6"  src="./0.png" onClick="press(6)">
+	<img id="img7"  src="./0.png" onClick="press(7)">
+	<img id="img8"  src="./0.png" onClick="press(8)">
+	<img id="img9"  src="./0.png" onClick="press(9)">
+	</div>
+</div>
+<div class="bottom"></div>
+</div>
+</body>
+</html>
